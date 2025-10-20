@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Hacker Base — Secure Node</title>
 <style>
-  /* ====== Basic / Reset ====== */
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{height:100%}
   body{
@@ -16,270 +15,140 @@
     -moz-osx-font-smoothing:grayscale;
     overflow:hidden;
   }
+  #matrix {position:fixed; inset:0; z-index:0; background:radial-gradient(ellipse at center, rgba(0,0,0,0.15), rgba(0,0,0,0.6));}
 
-  /* ====== matrix canvas ====== */
-  #matrix {
-    position:fixed;
-    inset:0;
-    z-index:0;
-    background:radial-gradient(ellipse at center, rgba(0,0,0,0.15), rgba(0,0,0,0.6));
-  }
+  .overlay {position:relative; z-index:2; display:flex; align-items:center; justify-content:center; height:100vh; padding:20px;}
+  .panel {width:980px; max-width:96%; background:linear-gradient(180deg, rgba(0,0,0,0.6), rgba(0,0,0,0.45)); border:1px solid rgba(142,242,122,0.08); padding:28px; border-radius:10px; box-shadow:0 8px 40px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.02); backdrop-filter: blur(4px); color:#c8ffbe; position:relative; overflow:visible;}
+  .panel::after{content:""; pointer-events:none; position:absolute; inset:0; background-image:linear-gradient(rgba(255,255,255,0.01) 1px, transparent 1px); background-size:100% 4px; mix-blend-mode:overlay; border-radius:10px; z-index:1; opacity:0.12;}
 
-  /* ====== Container ====== */
-  .overlay {
-    position:relative;
-    z-index:2;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    height:100vh;
-    padding:20px;
-  }
-
-  .panel {
-    width:980px;
-    max-width:96%;
-    background:linear-gradient(180deg, rgba(0,0,0,0.6), rgba(0,0,0,0.45));
-    border:1px solid rgba(142,242,122,0.08);
-    padding:28px;
-    border-radius:10px;
-    box-shadow:0 8px 40px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.02);
-    backdrop-filter: blur(4px);
-    color:#c8ffbe;
-    position:relative;
-    overflow:visible;
-  }
-
-  .panel::after{
-    content:"";
-    pointer-events:none;
-    position:absolute;
-    inset:0;
-    background-image:linear-gradient(rgba(255,255,255,0.01) 1px, transparent 1px);
-    background-size:100% 4px;
-    mix-blend-mode:overlay;
-    border-radius:10px;
-    z-index:1;
-    opacity:0.12;
-  }
-
-  /* ====== Header ====== */
-  .logo {
-    font-size:20px;
-    letter-spacing:2px;
-    color:#9aff8b;
-    display:flex;
-    gap:12px;
-    align-items:center;
-    margin-bottom:14px;
-  }
+  .logo {font-size:20px; letter-spacing:2px; color:#9aff8b; display:flex; gap:12px; align-items:center; margin-bottom:14px;}
   .logo .dot{width:10px;height:10px;border-radius:50%;background:#7bff74;box-shadow:0 0 8px #7bff74}
 
-  /* ====== Lock screen ====== */
   .lock { display:flex; gap:18px; align-items:center; justify-content:space-between; flex-wrap:wrap; }
   .lock-left{ min-width:240px; max-width:620px; }
   .big-title{ font-size:34px; color:#baff9a; margin-bottom:8px; text-shadow:0 2px 8px rgba(0,0,0,0.8) }
   .subtitle{ color:#9dcf98; font-size:13px; margin-bottom:18px; }
   .lock-controls{ display:flex; gap:8px; align-items:center; }
-  input[type="password"]{
-    background:rgba(0,0,0,0.6);
-    border:1px solid rgba(142,242,122,0.12);
-    color:#bfffb3;
-    padding:12px 14px;
-    border-radius:8px;
-    font-size:15px;
-    outline:none;
-    min-width:260px;
-  }
-  button{
-    background:#0f0f0f;
-    border:1px solid rgba(142,242,122,0.2);
-    color:#d7ffcf;
-    padding:12px 16px;
-    border-radius:8px;
-    cursor:pointer;
-    font-weight:700;
-    letter-spacing:1px;
-    transition: transform .08s ease, box-shadow .12s ease, background .12s ease, color .12s ease;
-  }
+  input[type="password"]{background:rgba(0,0,0,0.6); border:1px solid rgba(142,242,122,0.12); color:#bfffb3; padding:12px 14px; border-radius:8px; font-size:15px; outline:none; min-width:260px;}
+  button{background:#0f0f0f; border:1px solid rgba(142,242,122,0.2); color:#d7ffcf; padding:12px 16px; border-radius:8px; cursor:pointer; font-weight:700; letter-spacing:1px; transition: transform .08s ease, box-shadow .12s ease, background .12s ease, color .12s ease;}
   button:hover{ transform: translateY(-2px); box-shadow:0 6px 18px rgba(0,255,120,0.06) }
 
   .hint{ font-size:12px; color:#7da77b; margin-top:10px; }
 
-  /* ====== Dashboard ====== */
   .dashboard{ display:none; margin-top:18px; }
   .dash-top{ display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:12px; }
-  .access-badge{
-    background:linear-gradient(90deg,#052 #0b4);
-    padding:8px 12px;border-radius:8px;color:#002a00;font-weight:800;letter-spacing:1px;
-    box-shadow:0 6px 22px rgba(0,200,90,0.07), inset 0 -6px 18px rgba(0,0,0,0.35);
-  }
+  .access-badge{background:linear-gradient(90deg,#052 #0b4); padding:8px 12px;border-radius:8px;color:#002a00;font-weight:800;letter-spacing:1px; box-shadow:0 6px 22px rgba(0,200,90,0.07), inset 0 -6px 18px rgba(0,0,0,0.35);}
   .devices{ display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:12px; margin-top:12px; }
   .device{ background:rgba(0,0,0,0.45); border:1px solid rgba(142,242,122,0.06); padding:12px; border-radius:8px; min-height:52px; display:flex; flex-direction:column; justify-content:center; gap:6px; }
   .device .name{ font-weight:700; color:#cfffbd }
   .device .meta{ font-size:12px; color:#88b889 }
 
-  /* ====== PADLET EMBED ====== */
-  .padlet-container{
-    margin-top:16px;
-    display:none; /* hidden initially */
-    width:100%;
-    border:1px solid rgba(142,242,122,0.12);
-    border-radius:10px;
-    overflow:hidden;
-  }
-  .padlet-container iframe{
-    width:100%;
-    height:600px;
-    border:none;
-  }
+  .padlet-container{ margin-top:16px; display:none; width:100%; border:1px solid rgba(142,242,122,0.12); border-radius:10px; overflow:hidden; }
+  .padlet-container iframe{ width:100%; height:600px; border:none; }
 
-  /* ====== Hacker unlock animation ====== */
-  .glow {
-    position:absolute; inset:0; z-index:0; pointer-events:none; mix-blend-mode:screen; opacity:0;
-    background: radial-gradient(ellipse at center, rgba(80,255,120,0.06), transparent 30%);
-    transition: opacity .45s ease;
-  }
+  .glow {position:absolute; inset:0; z-index:0; pointer-events:none; mix-blend-mode:screen; opacity:0; background: radial-gradient(ellipse at center, rgba(80,255,120,0.06), transparent 30%); transition: opacity .45s ease;}
   .glow.active{ opacity:1; }
 
-  .banner {
-    margin-top:10px; font-size:20px; font-weight:900; letter-spacing:2px; color:#bfffb3;
-    text-shadow: 0 6px 40px rgba(0,255,120,0.06);
-    overflow:hidden;
-    display:inline-block;
-  }
-
-  /* tiny scanline flicker after unlock */
-  .scanline{
-    position: absolute; inset:0; z-index:3; pointer-events:none; mix-blend-mode:overlay;
-    background-image: linear-gradient(rgba(255,255,255,0.01) 1px, transparent 1px);
-    background-size:100% 4px; opacity:0.08;
-  }
+  .banner {margin-top:10px; font-size:20px; font-weight:900; letter-spacing:2px; color:#bfffb3; text-shadow: 0 6px 40px rgba(0,255,120,0.06); overflow:hidden; display:inline-block;}
+  .scanline{position: absolute; inset:0; z-index:3; pointer-events:none; mix-blend-mode:overlay; background-image: linear-gradient(rgba(255,255,255,0.01) 1px, transparent 1px); background-size:100% 4px; opacity:0.08;}
 </style>
 </head>
 <body>
-  <canvas id="matrix"></canvas>
-
-  <div class="overlay" role="main">
-    <div class="panel" id="panelRoot" aria-live="polite">
-      <div class="logo"><span class="dot" aria-hidden="true"></span><div>HACKER BASE • SECURE NODE</div></div>
-
-      <div class="lock" id="lockArea">
-        <div class="lock-left">
-          <div class="big-title">Access Node — Locked</div>
-          <div class="subtitle" id="subtitleText">Enter credentials to reveal the secure base. Unauthorized access is not permitted.</div>
-
-          <div class="lock-controls">
-            <input id="pwd" type="password" placeholder="Enter access pass..." aria-label="Password input" />
-            <button id="unlockBtn" aria-label="Unlock">UNLOCK</button>
-          </div>
-          <div class="hint" id="hintLine">Tip: Press Enter after typing the password.</div>
+<canvas id="matrix"></canvas>
+<div class="overlay" role="main">
+  <div class="panel" id="panelRoot">
+    <div class="logo"><span class="dot"></span><div>HACKER BASE • SECURE NODE</div></div>
+    <div class="lock" id="lockArea">
+      <div class="lock-left">
+        <div class="big-title">Access Node — Locked</div>
+        <div class="subtitle" id="subtitleText">Enter credentials to reveal the secure base. Unauthorized access is not permitted.</div>
+        <div class="lock-controls">
+          <input id="pwd" type="password" placeholder="Enter access pass..." />
+          <button id="unlockBtn">UNLOCK</button>
         </div>
-
-        <div style="min-width:220px; text-align:right;">
-          <div style="font-size:13px;color:#7db68a;font-weight:700">NODE STATUS</div>
-          <div style="font-size:30px;margin-top:8px;color:#8ff58f" id="statusBig">● LOCKED</div>
-          <div style="font-size:12px;color:#7aa573;margin-top:8px">Secure Layer • Client-only demo</div>
-        </div>
+        <div class="hint" id="hintLine">Tip: Press Enter after typing the password.</div>
       </div>
-
-      <!-- DASHBOARD -->
-      <div class="dashboard" id="dashboard" aria-hidden="true">
-        <div class="dash-top">
-          <div style="display:flex;gap:12px;align-items:center">
-            <div class="banner" id="accessBanner">ACCESS GRANTED</div>
-            <div class="access-badge">NODE: VX-42</div>
-          </div>
-        </div>
-
-        <!-- UPLOAD REPLACED WITH PADLET -->
-        <div style="margin-top:20px;">
-          <button id="showPadletBtn" style="padding:12px 20px; font-weight:700; cursor:pointer;">Choose File / Upload</button>
-          <div class="padlet-container" id="padletContainer">
-            <iframe src="https://padlet.com/embed/kit4180lqxj28lyy" allow="camera;microphone;geolocation;display-capture;clipboard-write"></iframe>
-          </div>
-        </div>
+      <div style="min-width:220px; text-align:right;">
+        <div style="font-size:13px;color:#7db68a;font-weight:700">NODE STATUS</div>
+        <div style="font-size:30px;margin-top:8px;color:#8ff58f" id="statusBig">● LOCKED</div>
+        <div style="font-size:12px;color:#7aa573;margin-top:8px">Secure Layer • Client-only demo</div>
       </div>
-
-      <div class="glow" id="glow"></div>
-      <div class="scanline"></div>
     </div>
+
+    <div class="dashboard" id="dashboard" aria-hidden="true">
+      <div class="dash-top">
+        <div style="display:flex;gap:12px;align-items:center">
+          <div class="banner" id="accessBanner">ACCESS GRANTED</div>
+          <div class="access-badge">NODE: VX-42</div>
+        </div>
+      </div>
+
+      <div style="margin-top:20px;">
+        <button id="showPadletBtn" style="padding:12px 20px; font-weight:700; cursor:pointer;">Choose File / Upload</button>
+        <div class="padlet-container" id="padletContainer">
+          <iframe src="https://padlet.com/embed/kit4180lqxj28lyy" allow="camera;microphone;geolocation;display-capture;clipboard-write"></iframe>
+        </div>
+      </div>
+
+      <div class="devices" id="devices"></div>
+    </div>
+
+    <div class="glow" id="glow"></div>
+    <div class="scanline"></div>
   </div>
+</div>
 
 <script>
-/* =========================
-   MATRIX BACKGROUND
-   ========================= */
+/* MATRIX */
 const canvas = document.getElementById('matrix');
 const ctx = canvas.getContext('2d');
-let W = innerWidth, H = innerHeight, cols, yPos;
-function resize() {
-  canvas.width = W = innerWidth;
-  canvas.height = H = innerHeight;
-  cols = Math.floor(W / 14) + 1;
-  yPos = Array(cols).fill(0).map(()=>Math.floor(Math.random()*H));
-}
-addEventListener('resize', resize);
-resize();
+let W = innerWidth,H=innerHeight,cols,yPos;
+function resize(){canvas.width=W=innerWidth; canvas.height=H=innerHeight; cols=Math.floor(W/14)+1; yPos=Array(cols).fill(0).map(()=>Math.floor(Math.random()*H));}
+addEventListener('resize',resize); resize();
+const letters="アァカサタナハマヤャラワィイキシチニヒミリヰウヴ".split('').concat("01".split(''));
+function drawMatrix(){ctx.fillStyle='rgba(0,0,0,0.06)'; ctx.fillRect(0,0,W,H); ctx.font='14px monospace'; for(let i=0;i<cols;i++){const text=letters[Math.floor(Math.random()*letters.length)]; const x=i*14; ctx.fillStyle='rgba(30,255,120,0.9)'; ctx.fillText(text,x,yPos[i]); yPos[i]+=14+Math.random()*8; if(yPos[i]>H+Math.random()*1000)yPos[i]=0;}}
+let matrixAnim=setInterval(drawMatrix,55);
 
-const letters = "アァカサタナハマヤャラワィイキシチニヒミリヰウヴ".split('').concat("01".split(''));
-function drawMatrix(){
-  ctx.fillStyle = 'rgba(0,0,0,0.06)';
-  ctx.fillRect(0,0,W,H);
-  ctx.font = '14px monospace';
-  for(let i=0;i<cols;i++){
-    const text = letters[Math.floor(Math.random()*letters.length)];
-    const x = i*14;
-    ctx.fillStyle = 'rgba(30,255,120,0.9)';
-    ctx.fillText(text,x,yPos[i]);
-    yPos[i] += 14 + Math.random()*8;
-    if (yPos[i] > H + Math.random()*1000) yPos[i] = 0;
-  }
-}
-setInterval(drawMatrix, 55);
+/* UNLOCK */
+const pwd=document.getElementById('pwd'), unlockBtn=document.getElementById('unlockBtn'), dashboard=document.getElementById('dashboard'), statusBig=document.getElementById('statusBig'), subtitleText=document.getElementById('subtitleText'), glow=document.getElementById('glow'), banner=document.getElementById('accessBanner');
+const PASSWORD='smdk@2025';
+const devicesContainer=document.getElementById('devices');
 
-/* =========================
-   UNLOCK LOGIC
-   ========================= */
-const pwd = document.getElementById('pwd');
-const unlockBtn = document.getElementById('unlockBtn');
-const dashboard = document.getElementById('dashboard');
-const statusBig = document.getElementById('statusBig');
-const subtitleText = document.getElementById('subtitleText');
-const glow = document.getElementById('glow');
-const banner = document.getElementById('accessBanner');
-
-const PASSWORD = 'smdk@2025';
-
+function fakeDevice(name,ip){const div=document.createElement('div'); div.className='device'; div.innerHTML=`<div class="name">${name}</div><div class="meta">${ip}</div>`; devicesContainer.appendChild(div);}
 function unlock(){
-  if(pwd.value === PASSWORD){
-    subtitleText.textContent = 'Welcome back operator — session active.';
-    statusBig.textContent = '● ONLINE';
-    dashboard.style.display = 'block';
+  if(pwd.value===PASSWORD){
+    subtitleText.textContent='Welcome back operator — session active.';
+    statusBig.textContent='● ONLINE';
+    dashboard.style.display='block';
     glow.classList.add('active');
-    banner.textContent = 'ACCESS GRANTED — NODE VX-42';
+    banner.textContent='ACCESS GRANTED — NODE VX-42';
+
+    // FAKE CONNECTIONS
+    devicesContainer.innerHTML=''; 
+    const fakeDevices=[['Alpha Node','192.168.0.2'],['Beta Hub','192.168.0.3'],['Gamma Client','192.168.0.7'],['Delta Unit','10.0.0.5']];
+    fakeDevices.forEach((d,i)=>setTimeout(()=>fakeDevice(d[0],d[1]),i*500));
+
+    // Matrix speedup flash
+    let fast=0; const interval=setInterval(()=>{fast++; drawMatrix(); if(fast>20)clearInterval(interval)},25);
   } else {
-    const el = document.querySelector('.panel');
-    el.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(-6px)' }, { transform: 'translateX(6px)' }, { transform: 'translateX(0)' }], { duration: 320 });
-    const oldHint = document.getElementById('hintLine').textContent;
-    document.getElementById('hintLine').textContent = 'Access Denied — wrong pass.';
-    setTimeout(()=> document.getElementById('hintLine').textContent = oldHint, 1200);
+    const el=document.querySelector('.panel');
+    el.animate([{transform:'translateX(0)'},{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'translateX(0)'}],{duration:320});
+    const oldHint=document.getElementById('hintLine').textContent;
+    document.getElementById('hintLine').textContent='Access Denied — wrong pass.';
+    setTimeout(()=>document.getElementById('hintLine').textContent=oldHint,1200);
   }
 }
-unlockBtn.addEventListener('click', unlock);
-pwd.addEventListener('keydown', (e)=>{ if(e.key==='Enter') unlock(); });
-window.addEventListener('load', ()=> pwd.focus());
+unlockBtn.addEventListener('click',unlock);
+pwd.addEventListener('keydown',(e)=>{if(e.key==='Enter')unlock();});
+window.addEventListener('load',()=>pwd.focus());
 
-/* =========================
-   SHOW PADLET ON BUTTON CLICK
-   ========================= */
-const showPadletBtn = document.getElementById('showPadletBtn');
-const padletContainer = document.getElementById('padletContainer');
-showPadletBtn.addEventListener('click', ()=>{
-  padletContainer.style.display = 'block';
-  showPadletBtn.style.display = 'none';
+/* SHOW PADLET */
+const showPadletBtn=document.getElementById('showPadletBtn');
+const padletContainer=document.getElementById('padletContainer');
+showPadletBtn.addEventListener('click',()=>{
+  padletContainer.style.display='block';
+  showPadletBtn.style.display='none';
 });
 </script>
 </body>
 </html>
-
